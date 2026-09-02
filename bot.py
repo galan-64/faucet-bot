@@ -61,7 +61,7 @@ def run_gr8_claims():
     
     print(f"🚀 Запуск сборщика для {len(WALLETS)} монет...")
     
-    for coin, address in WALLETS.items().
+    for coin, address in WALLETS.items():
         url = FAUCET_PAGES.get(coin)
         if not url:
             continue
@@ -69,28 +69,26 @@ def run_gr8_claims():
         print(f"\n[🔄] Обработка: {coin}")
         print(f"    Адрес: {address}")
         
-        # Параметры, которые скрипт отправляет форме клейма
         payload = {
             "address": address,
             "submit": "Claim"
         }
         
         try:
-            # Отправляем POST-запрос на страницу крана с вашими куками
             response = requests.post(url, data=payload, headers=headers, timeout=15)
             
             if response.status_code == 200:
                 if "sent to your FaucetPay" in response.text or "success" in response.text.lower():
                     print(f"    [✓] Успешно! Монеты отправлены на FaucetPay.")
                 else:
-                    print(f"    [~] Страница ответила (код 200), но нужен таймер или капча (проверьте логи).")
+                    print(f"    [~] Страница ответила (код 200), но требуется прохождение защиты/таймера.")
             else:
                 print(f"    [-] Ошибка сервера: Код {response.status_code}")
                 
         except Exception as e:
             print(f"    [❌] Сбой соединения: {e}")
             
-        time.sleep(3) # Пауза между монетами
+        time.sleep(3)
 
 if __name__ == "__main__":
     run_gr8_claims()
