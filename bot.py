@@ -2,7 +2,7 @@ import os
 import time
 import requests
 
-# Полный список ваших криптовалютных кошельков
+# Список ваших кошельков
 WALLETS = {
     "BTC": "15C9bpBaYAj5Vbcj637mb8EZ3rubnBLQA1",
     "ETH": "0x90C12E633fcb59995A1f0B28CDaE8b0CdA785770",
@@ -12,7 +12,7 @@ WALLETS = {
     "DASH": "XitiTgcWTRvWYWieNjZTbRiMzFexmTU921",
     "DGB": "DHGkbvxurTeGJ6FYrMSjAtikQpYRiMkSX9",
     "TRX": "TXDwVHFJdWLW1aLQmsZyDHAc3Tyc7sZdzP",
-    "USDT (TRC20)": "TXDwVHFJdWLW1aLQmsZyDHAc3Tyc7sZdzP",
+    "USDT": "TXDwVHFJdWLW1aLQmsZyDHAc3Tyc7sZdzP",
     "FEYORRA": "0x90C12E633fcb59995A1f0B28CDaE8b0CdA785770",
     "ZCASH": "t1e2wLr6BezRQKKjigSj47mYToysX4sms8Z",
     "BNB": "0x40ff878fbd7D2544218ee6E5fC60A7bC4EaB837c",
@@ -26,34 +26,71 @@ WALLETS = {
     "MONERO": "4ByeEKTJbi3faVNHTWEupmM1fdwEv95CqCqC7rCDdVhXDt4vj5E4FB1jUKxNAF6EHFHmuQhnHoXcUK84Nc4cQfmfKQ8zXo5FtSDLpiz6wC"
 }
 
-def full_faucet_checker():
-    print(f"🚀 Запуск облачного сканера для {len(WALLETS)} криптовалютных адресов...")
+# Прямые ссылки на страницы сбора монеты на ClaimFreeCoins
+FAUCET_PAGES = {
+    "BTC": "https://claimfreecoins.io/bitcoin-faucet/",
+    "ETH": "https://claimfreecoins.io/ethereum-faucet/",
+    "DOGE": "https://claimfreecoins.io/dogecoin-faucet/",
+    "LITECOIN": "https://claimfreecoins.io/litecoin-faucet/",
+    "BCH": "https://claimfreecoins.io/bitcoin-cash-faucet/",
+    "DASH": "https://claimfreecoins.io/dash-faucet/",
+    "DGB": "https://claimfreecoins.io/digibyte-faucet/",
+    "TRX": "https://claimfreecoins.io/tron-faucet/",
+    "USDT": "https://claimfreecoins.io/tether-faucet/",
+    "FEYORRA": "https://claimfreecoins.io/feyorra-faucet/",
+    "ZCASH": "https://claimfreecoins.io/zcash-faucet/",
+    "BNB": "https://claimfreecoins.io/binance-coin-faucet/",
+    "SOLANA": "https://claimfreecoins.io/solana-faucet/",
+    "RIPPLE": "https://claimfreecoins.io/ripple-faucet/",
+    "POLYGON": "https://claimfreecoins.io/polygon-faucet/",
+    "CARDANO": "https://claimfreecoins.io/cardano-faucet/",
+    "TONCOIN": "https://claimfreecoins.io/toncoin-faucet/",
+    "STELLAR": "https://claimfreecoins.io/stellar-faucet/",
+    "USDC": "https://claimfreecoins.io/usdc-faucet/",
+    "MONERO": "https://claimfreecoins.io/monero-faucet/"
+}
+
+def run_gr8_claims():
+    session_cookie = os.getenv("FAUCET_SESSION_COOKIE", "")
     
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+        "Cookie": session_cookie,
+        "Referer": "https://claimfreecoins.io/"
     }
     
-    success_count = 0
+    print(f"🚀 Запуск сборщика для {len(WALLETS)} монет...")
     
-    for coin, address in WALLETS.items():
-        print(f"\n[•] Проверка шлюза для: {coin}")
+    for coin, address in WALLETS.items().
+        url = FAUCET_PAGES.get(coin)
+        if not url:
+            continue
+            
+        print(f"\n[🔄] Обработка: {coin}")
         print(f"    Адрес: {address}")
         
+        # Параметры, которые скрипт отправляет форме клейма
+        payload = {
+            "address": address,
+            "submit": "Claim"
+        }
+        
         try:
-            # Пинг официального шлюза экосистемы FaucetPay
-            response = requests.get("https://faucetpay.io/earns/faucet", headers=headers, timeout=10)
-            if response.status_code == 200:
-                print(f"    [✓] Шлюз активен. Адрес подтвержден в облаке.")
-                success_count += 1
-            else:
-                print(f"    [-] Шлюз ответил кодом: {response.status_code}")
-        except Exception as e:
-            print(f"    [!] Ошибка соединения: {e}")
+            # Отправляем POST-запрос на страницу крана с вашими куками
+            response = requests.post(url, data=payload, headers=headers, timeout=15)
             
-        # Небольшая пауза между запросами, чтобы не перегружать сеть
-        time.sleep(1.5)
-
-    print(f"\n🎯 Проверка завершена! Успешно обработано кошельков: {success_count} из {len(WALLETS)}")
+            if response.status_code == 200:
+                if "sent to your FaucetPay" in response.text or "success" in response.text.lower():
+                    print(f"    [✓] Успешно! Монеты отправлены на FaucetPay.")
+                else:
+                    print(f"    [~] Страница ответила (код 200), но нужен таймер или капча (проверьте логи).")
+            else:
+                print(f"    [-] Ошибка сервера: Код {response.status_code}")
+                
+        except Exception as e:
+            print(f"    [❌] Сбой соединения: {e}")
+            
+        time.sleep(3) # Пауза между монетами
 
 if __name__ == "__main__":
-    full_faucet_checker()
+    run_gr8_claims()
